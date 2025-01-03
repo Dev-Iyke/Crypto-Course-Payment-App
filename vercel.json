@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npx prisma migrate deploy && npx prisma db seed && npm run build",
+  "buildCommand": "npx prisma migrate deploy && node --loader ts-node/esm prisma/seed.ts && npm run build",
   "crons": [
     {
       "path": "/api/cron-process-emails",
