@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directUrl         = env("DIRECT_URL")
+}
+
+// Define models
+model User {
+  id                String    @id @default(uuid())
+  firstName         String    @default("")
+  lastName          String    @default("")
+  email             String    @unique @default("")
+  course            String    @default("")
+  country           String    @default("")
+  state             String    @default("")
+  phoneNumber       String    @default("")
+  isPaid            Boolean   @default(false)
+  paymentType       String? // "full" or "discount"
+  isEligibleForDraw Boolean? //true or false
+  Payment           Payment[]
+}
+
+//Check how you are to get the payment id. whether from the payment gateway or created myself
+model Payment {
+  id            String   @id @default(uuid())
+  paymentId     String   @unique
+  userId        String
+  amount        Float
+  paymentStatus String
+  isEmailSent   Boolean? //true or false
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Course {
+  id                   Int    @id @default(autoincrement())
+  name                 String @unique
+  fullPrice            Float
+  discountPrice        Float
+  fullPaymentLimit     Int    @default(10)
+  discountLimit        Int    @default(10)
+  fullPaymentCount     Int    @default(0)
+  discountPaymentCount Int    @default(0)
+}
+
+model EmailQueue {
+  id             String   @id @default(uuid())
+  to             String
+  subject        String
+  text           String
+  html           String?
+  emailPaymentId String?
+  retryAt        DateTime @default(now())
+  status         String   @default("pending") // "pending", "sent", "failed"
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
