@@ -4,14 +4,33 @@ import { prisma } from "@/lib/prisma";
 // Set the API key from environment variables
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
-//Delay helper
-function delay(ms: number){
+// Delay helper
+function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-//function to send Emails
-export async function sendEmail(to: string, subject: string, text: string, paymentId?: string, html?: string, retries = 3): Promise<void> {
-  console.log(`sending email to ${to}`)
+// Define the error response structure
+interface SendGridErrorResponse {
+  response: {
+    body: {
+      errors: { message: string }[];
+    };
+    statusCode: number;
+    headers: { [key: string]: string };
+  };
+}
+
+// Function to send Emails
+export async function sendEmail(
+  to: string, 
+  subject: string, 
+  text: string, 
+  paymentId?: string, 
+  html?: string, 
+  retries = 3
+): Promise<void> {
+  console.log(`sending email to ${to}`);
+  
   try {
     const msg = {
       to, // recipient's email
@@ -37,27 +56,37 @@ export async function sendEmail(to: string, subject: string, text: string, payme
       throw new Error("Failed to confirm email delivery.");
     }
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error sending email:', error);
 
-    //check for specific errors
-    if (error.response) {
-      console.error('Error details:', error.response.body);
-      const statusCode = error.response.statusCode;
+    // Ensure error is of type SendGridErrorResponse
+    if (isSendGridErrorResponse(error)) {
+      const errorResponse = error.response;
+      console.error('Error details:', errorResponse.body);
+      const statusCode = errorResponse.statusCode;
 
-      if(statusCode === 429 || (Array.isArray(error.response.body?.errors) && error.response.body.errors.some((e: any) => e.message.includes('daily limit exceeded'))) ){
-        console.error('Daily limit exceeded. Scheduling for the next day...')
-
-        //store the email details in the database
+      // Handle specific errors like daily limit exceeded
+      if (statusCode === 429 || 
+          (Array.isArray(errorResponse.body?.errors) && 
+           errorResponse.body.errors.some((e) => e.message.includes('daily limit exceeded')))) {
+        console.error('Daily limit exceeded. Scheduling for the next day...');
+        
+        // Store the email details in the database
         await scheduleForNextDay(to, subject, text, html, paymentId);
-        return
-      }
-      if (error.response.headers['x-ratelimit-reset']) {
-        const resetTimestamp = error.response.headers['x-ratelimit-reset'];
-        console.log(`Rate limit resets at ${new Date(resetTimestamp * 1000).toISOString()}`);
+        return;
       }
 
-      // Handle other sendGrid errors
+      // Handle rate-limiting reset
+      if (errorResponse.headers['x-ratelimit-reset']) {
+        const resetTimestamp = Number(errorResponse.headers['x-ratelimit-reset']);
+        if (!isNaN(resetTimestamp)) {
+          console.log(`Rate limit resets at ${new Date(resetTimestamp * 1000).toISOString()}`);
+        } else {
+          console.error('Invalid rate limit reset timestamp.');
+        }
+      }
+
+      // Handle other SendGrid errors with statusCode >= 500
       if (statusCode >= 500) {
         console.error('Temporary server error. Retrying...');
         if (retries > 0) {
@@ -70,13 +99,20 @@ export async function sendEmail(to: string, subject: string, text: string, payme
       }
     }
 
-    if (!error.response?.statusCode || retries <= 0) {
-      console.error('Non-retryAble error or retries exhausted.');
+    // If no valid error response or retries exhausted
+    if (!(error instanceof Error) || retries <= 0) {
+      console.error('Non-retryable error or retries exhausted.');
       throw error;
     }
-    //for other errors
+
+    // For other errors
     throw error;
   }
+}
+
+// Helper function to check if the error is of type SendGridErrorResponse
+function isSendGridErrorResponse(error: unknown): error is SendGridErrorResponse {
+  return (error as SendGridErrorResponse).response !== undefined;
 }
 
 export async function scheduleForNextDay(

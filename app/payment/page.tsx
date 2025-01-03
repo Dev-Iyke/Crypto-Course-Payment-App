@@ -1,6 +1,6 @@
 'use client'
 
-import React, { ReactEventHandler, ReactNode, useEffect, useState } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 import { SignUpFormData } from '../signup/components/SignUpPage'
 import { toast } from '@/hooks/use-toast';
@@ -41,9 +41,9 @@ const PaymentPage = () => {
   
   const [paymentCoin, setPaymentCoin] = useState<string>('');
   // const [paymentAmount, setPaymentAmount] = useState(0);
-  
   const [paymentUrl, setPaymentUrl] = useState(null);
-  const [paymentLinkGenerated, setPaymentLinkGenerated] = useState(false);
+  // const [paymentLinkGenerated, setPaymentLinkGenerated] = useState(false);
+  console.log(paymentCoin)
 
   const router = useRouter()
   useEffect(() => {
@@ -78,7 +78,7 @@ const PaymentPage = () => {
       }
     }
     getUserId()
-  }, [])
+  }, [setUserDetails])
 
   console.log(userDetails?.email)
 
@@ -175,7 +175,11 @@ const PaymentPage = () => {
           console.log(data)
           Cookies.set('paymentDetails', JSON.stringify({...data, paymentType}));
           const paymentData = Cookies.get('paymentDetails')
-          paymentData? console.log(JSON.parse(paymentData)) : console.log('not found')
+          if (paymentData) {
+            console.log(JSON.parse(paymentData));
+          } else {
+            console.log('not found');
+          }
           setPaymentUrl(data.invoice_url)
           toast({
             title: 'Success!',
@@ -226,35 +230,45 @@ const PaymentPage = () => {
           variant: 'success',
           description: `${paymentData.message} \n An email has been sent to ${userDetails?.email}`,
         })
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.log(error)
-        toast({
-          title: 'Failed!',
-          variant: 'destructive',
-          description: `${error.message} \n An email has been sent to ${userDetails?.email}`,
-        })
+        if (error instanceof Error) {
+          // Using a well-defined error message for the toast
+          toast({
+            title: 'Failed!',
+            variant: 'destructive',
+            description: `${error.message} \n An email has been sent to ${userDetails?.email}`,
+          });
+        } else {
+          // Fallback in case the error is not an instance of Error
+          toast({
+            title: 'Failed!',
+            variant: 'destructive',
+            description: `An email has been sent to ${userDetails?.email}`,
+          })
+        }
       }
     }
     setIsConfirmLoading(false)
   }
 
-  const getAllCoins = async () => {
-    try {
-      const response = await fetch(`/api/initialize-payment`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      const data = await response.json()
-      if(response.ok){
-        console.log(data)
-      }
-      throw new Error(data.error)
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  // const getAllCoins = async () => {
+  //   try {
+  //     const response = await fetch(`/api/initialize-payment`, {
+  //       method: 'GET',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //     })
+  //     const data = await response.json()
+  //     if(response.ok){
+  //       console.log(data)
+  //     }
+  //     throw new Error(data.error)
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
 
   // getAllCoins()
 

@@ -40,7 +40,7 @@ export async function GET(req: Request) {
     const userExists = await prisma.user.findFirst({
       where: { email: body.email },
     })
-    const resp = userExists === null
+    // const resp = userExists === null
     console.log('User exists:', userExists);
     return new Response(JSON.stringify(userExists), { status: 200 });
   } catch (error) {

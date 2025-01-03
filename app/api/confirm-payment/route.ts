@@ -60,7 +60,7 @@ export async function POST(req: Request) {
 
     //Update course counts in database
     if(paymentData.payment_status === 'finished'){
-      let updateCourse = await prisma.course.findFirst({
+      const updateCourse = await prisma.course.findFirst({
         where: {name: course}
       })
 
