@@ -1,34 +1,35 @@
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
-interface Context {
-  params: {
+interface RouteContext {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export async function GET(req: Request, context: Context) {
-  const { params } = context;
-  
+export async function GET(req: NextRequest, context: RouteContext) {
   try {
+    const { id } = await context.params;
+
+    if (!id) {
+      return NextResponse.json({ error: "Missing or invalid user ID" }, { status: 400 });
+    }
+
     const user = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     if (!user) {
-      return new Response(JSON.stringify({ error: "User not found" }), {
-        status: 404,
-      });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return new Response(JSON.stringify(user), { status: 200 });
+    return NextResponse.json(user, { status: 200 });
   } catch (error) {
     console.error("Error fetching user data:", error);
-    return new Response(
-      JSON.stringify({ error: "Failed to fetch user data" }),
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch user data" }, { status: 500 });
   }
 }
+
 
 
 // const fetchUserData = async () => {

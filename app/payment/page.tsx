@@ -155,7 +155,7 @@ const PaymentPage = () => {
     }
 
     getCourseDetails()
-  }, [paymentType])
+  }, [paymentType, userDetails])
 
   async function generatePaymentLink(){
       console.log(`Generating payment link`)
