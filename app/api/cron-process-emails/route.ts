@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/sendgrid";
 
-export default async function handler() {
+export default async function GET() {
   try {
     const emails = await prisma.emailQueue.findMany({
       where: {
