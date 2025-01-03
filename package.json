@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "type": "module",
+  "engines": {
+  "node": ">=20"
+  },
   "dependencies": {
     "@prisma/client": "^6.1.0",
     "@radix-ui/react-toast": "^1.2.4",
