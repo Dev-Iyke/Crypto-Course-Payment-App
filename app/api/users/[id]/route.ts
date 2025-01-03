@@ -1,6 +1,14 @@
 import { prisma } from "@/lib/prisma";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+interface Context {
+  params: {
+    id: string;
+  };
+}
+
+export async function GET(req: Request, context: Context) {
+  const { params } = context;
+  
   try {
     const user = await prisma.user.findUnique({
       where: { id: params.id },
