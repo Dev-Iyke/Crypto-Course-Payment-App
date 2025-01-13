@@ -5,11 +5,13 @@ export async function POST(req: Request){
     const body = await req.json();
     const {course, paymentType} = body;
     
+    //Get the selected course
     const courseData = await prisma.course.findFirst({where: {name: course}})
     if (!courseData) {
       return new Response(JSON.stringify({error: 'course not found'}), {status: 404});
     }
 
+    //determine the course details
     let price, message;
     if (paymentType === 'full') {
       if(courseData.fullPaymentCount < courseData.fullPaymentLimit){

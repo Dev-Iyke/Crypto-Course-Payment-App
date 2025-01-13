@@ -8,6 +8,7 @@ interface RouteContext {
 }
 
 export async function GET(req: NextRequest, context: RouteContext) {
+  //Fetching a single user from the database
   try {
     const { id } = await context.params;
 
@@ -29,23 +30,3 @@ export async function GET(req: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: "Failed to fetch user data" }, { status: 500 });
   }
 }
-
-
-
-// const fetchUserData = async () => {
-//   const userId = localStorage.getItem("userId");
-
-//   if (!userId) {
-//     alert("User not found. Redirecting to signup...");
-//     window.location.href = "/signup";
-//     return;
-//   }
-
-//   const response = await fetch(`/api/users/${userId}`);
-//   if (response.ok) {
-//     const userData = await response.json();
-//     setUser(userData);
-//   } else {
-//     alert("Failed to fetch user data");
-//   }
-// };

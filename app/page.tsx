@@ -1,7 +1,6 @@
-'use client'; // Mark this as a client component
-
+'use client';
 import React from 'react';
-import SignUpPage from './signup/components/SignUpPage';
+import SignUpPage from '../components/SignUpPage';
 // import SignUpPage from './components/SignUpPage';
 
 const HomePage = () => {

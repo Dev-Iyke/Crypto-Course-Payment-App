@@ -3,6 +3,7 @@ import { sendEmail } from "@/lib/sendgrid";
 
 export const GET = async () => {
   try {
+    //Retrieve all pending emails
     const emails = await prisma.emailQueue.findMany({
       where: {
         status: "pending",
@@ -10,6 +11,7 @@ export const GET = async () => {
       },
     });
 
+    //Sending emails to all users pending
     for (const email of emails) {
       try {
         await sendEmail(email.to, email.subject, email.text); 
@@ -30,6 +32,7 @@ export const GET = async () => {
         if (error) {
           console.error(`Failed to resend email ID ${email.id}`, error);
           const now = new Date();
+          //Ensuring each email is allowed to be resent twice daily if first one fails
           const nextRetry = now.getHours() >= 20
             ? new Date(now.setHours(8, 0, 0, 0) + 24 * 60 * 60 * 1000) // Next day's 8 AM
             : new Date(now.setHours(20, 0, 0, 0)); // Same day's 8 PM

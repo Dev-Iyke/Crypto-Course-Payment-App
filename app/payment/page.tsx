@@ -2,7 +2,7 @@
 
 import React, { ReactNode, useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
-import { SignUpFormData } from '../signup/components/SignUpPage'
+import { SignUpFormData } from '../../components/SignUpPage'
 import { toast } from '@/hooks/use-toast';
 import { tokens } from '@/lib/tokens';
 import { useRouter } from 'next/navigation';
@@ -323,9 +323,9 @@ const PaymentPage = () => {
         <button onClick={() => router.back()} className="text-white p-4">back</button>
       </div>
 
-      <div className="px-8 pt-12 pb-32">
+      <div className="px-4 md:px-8 pt-12 pb-32">
         <div className="text-center mx-auto mb-8">
-          <h1 className="text-white text-3xl font-semibold">
+          <h1 className="text-white text-2xl md:text-3xl font-semibold">
             Complete Your Payment
           </h1>
           <p className="text-md text-[#B3B3B3] mt-2">

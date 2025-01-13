@@ -7,8 +7,8 @@ export async function POST(req: Request) {
     const {course, paymentType, paymentId, userId, paymentAmount} = body;
     console.log(body)
 
-    // console.log('email sent')
-    const userEmail = 'rcin2613@shopvia2fa.net'
+    // Testing sendEmail function
+    const userEmail = 'denisulyashev@chupanhcuoidep.vn'
     await sendEmail(
       userEmail,
       "Payment Confirmation",
@@ -34,7 +34,6 @@ export async function POST(req: Request) {
       </html>
       `
     );
-    // console.log('email sent')
 
     //Check if payment has already been confirmed
     const existingPayment = await prisma.payment.findUnique({

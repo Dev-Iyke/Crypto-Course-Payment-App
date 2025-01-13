@@ -5,7 +5,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log('Incoming POST data:', body); // Debug log
     
-    //Remove this check if clients wants a user to signup multiple times with the same email
+    //TODO:Remove this check if clients wants a user to signup multiple times with the same email
     const userExists = await prisma.user.findFirst({
       where: { email: body.email },
     })

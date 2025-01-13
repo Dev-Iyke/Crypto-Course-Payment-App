@@ -30,6 +30,7 @@ export async function POST(req: Request){
 
 
 export async function GET(){
+  //fetch available coins on my NowPayments dashboard
   try {
     const myAvailableCoinsResponse = await fetch("https://api.nowpayments.io/v1/merchant/coins", {
       method: "GET",

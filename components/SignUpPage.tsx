@@ -92,9 +92,9 @@ const SignUpPage: React.FC = () => {
         {/* <h3 className="text-white">back</h3> */}
       </div>
 
-      <div className="col-span-3 px-8 py-12">
+      <div className="col-span-3 px-2 sm:px-4 md:px-8 py-12">
         <div className="text-center w-[65%] mx-auto mb-8">
-          <h1 className="text-white text-3xl font-semibold">
+          <h1 className="text-2xl text-white md:text-3xl font-semibold">
             Join Our Exclusive FX & Web3 Training Program
           </h1>
           <p className="text-md text-[#B3B3B3] mt-2">
@@ -121,7 +121,7 @@ const SignUpPage: React.FC = () => {
                 {...register("firstName", {
                   required: "Please enter your first name",
                 })}
-                className="bg-[#222121] py-2 px-3 text-lg rounded-[5px] text-white outline-none placeholder:text-[#5B5B5B]"
+                className="bg-[#222121] w-full py-2 px-3 text-lg rounded-[5px] text-white outline-none placeholder:text-[#5B5B5B]"
               />
               {errors.firstName && (
                 <p className="text-red-500">{errors.firstName.message}</p>
@@ -138,7 +138,7 @@ const SignUpPage: React.FC = () => {
                 {...register("lastName", {
                   required: "Please enter your last name",
                 })}
-                className="bg-[#222121] py-2 px-3 text-lg rounded-[5px] text-white outline-none placeholder:text-[#5B5B5B]"
+                className="bg-[#222121] w-full py-2 px-3 text-lg rounded-[5px] text-white outline-none placeholder:text-[#5B5B5B]"
               />
               {errors.lastName && (
                 <p className="text-red-500">{errors.lastName.message}</p>
@@ -195,7 +195,7 @@ const SignUpPage: React.FC = () => {
                 {...register("country", {
                   required: "Please enter your country",
                 })}
-                className="bg-[#222121] py-2 px-3 text-lg rounded-[5px] text-white outline-none placeholder:text-[#5B5B5B]"
+                className="bg-[#222121] w-full py-2 px-3 text-lg rounded-[5px] text-white outline-none placeholder:text-[#5B5B5B]"
               />
               {errors.country && (
                 <p className="text-red-500">{errors.country.message}</p>
@@ -211,7 +211,7 @@ const SignUpPage: React.FC = () => {
                 {...register("state", {
                   required: "Please enter your state",
                 })}
-                className="bg-[#222121] py-2 px-3 text-lg rounded-[5px] text-white outline-none placeholder:text-[#5B5B5B]"
+                className="bg-[#222121] w-full py-2 px-3 text-lg rounded-[5px] text-white outline-none placeholder:text-[#5B5B5B]"
               />
               {errors.state && (
                 <p className="text-red-500">{errors.state.message}</p>
