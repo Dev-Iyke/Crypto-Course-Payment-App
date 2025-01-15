@@ -2,7 +2,7 @@ import React from 'react'
 
 const Checkbox = ({isChecked, checkTerms}: {
   isChecked: boolean,
-  checkTerms: () => void,
+  checkTerms: (event: React.ChangeEvent<HTMLInputElement>) => void,
 }) => {
   return (
     <div>
