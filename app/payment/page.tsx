@@ -9,17 +9,7 @@ import { useRouter } from 'next/navigation';
 import Checkbox from '@/components/Checkbox';
 import Loader from '@/components/Loader';
 import { FailureModal, SuccessModal } from '@/components/Modals';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
+import {AlertDialog} from "@/components/ui/alert-dialog"
 import { ArrowBigLeftIcon } from 'lucide-react';
 interface DatabaseUser extends SignUpFormData {
   id: string;
@@ -441,7 +431,7 @@ const PaymentPage = () => {
           </div>
 
           <div className="flex items-center gap-1">
-          <div className="mr-2">
+            <div className="mr-2">
               <Checkbox
                 isChecked={isTermsAccepted}
                 checkTerms={handleTermsChange}

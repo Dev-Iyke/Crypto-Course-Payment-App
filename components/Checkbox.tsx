@@ -1,6 +1,9 @@
 import React from 'react'
 
-const Checkbox = ({isChecked, className, checkTerms}: any) => {
+const Checkbox = ({isChecked, checkTerms}: {
+  isChecked: boolean,
+  checkTerms: () => void,
+}) => {
   return (
     <div>
       <label className='checkbox-container'>
