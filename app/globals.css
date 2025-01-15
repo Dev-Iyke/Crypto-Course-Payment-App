@@ -70,3 +70,86 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+
+/* Checkbox */
+.checkbox-container {
+  cursor: pointer;
+}
+
+.checkbox-container input {
+  display: none;
+}
+
+.checkbox-container svg {
+  overflow: visible;
+}
+
+.path {
+  fill: none;
+  stroke: white;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke-dasharray 0.5s ease, stroke-dashoffset 0.5s ease;
+  stroke-dasharray: 241 9999999;
+  stroke-dashoffset: 0;
+}
+
+.checkbox-container input:checked ~ svg .path {
+  stroke-dasharray: 70.5096664428711 9999999;
+  stroke-dashoffset: -262.2723388671875;
+}
+
+/* Loader component */
+.custom-loader {
+  width: 25px;
+  height: 25px;
+  display: grid;
+}
+.custom-loader::before,
+.custom-loader::after {    
+  content:"";
+  grid-area: 1/1;
+  --c: radial-gradient(farthest-side,#D8F0F4 92%,#0000);
+  background: 
+    var(--c) 50%  0, 
+    var(--c) 50%  100%, 
+    var(--c) 100% 50%, 
+    var(--c) 0    50%;
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+  animation: s2 1s infinite;
+}
+.custom-loader::before {
+margin:2px;
+filter:hue-rotate(45deg);
+background-size: 4px 4px;
+animation-timing-function: linear
+}
+
+@keyframes s2{ 
+100%{transform: rotate(.5turn)}
+}
+
+/* Round custom loader */
+.round-custom-loader {
+  --d:44px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  color: #307268;
+  box-shadow: 
+    calc(1*var(--d))      calc(0*var(--d))     0 0,
+    calc(0.707*var(--d))  calc(0.707*var(--d)) 0 2px,
+    calc(0*var(--d))      calc(1*var(--d))     0 4px,
+    calc(-0.707*var(--d)) calc(0.707*var(--d)) 0 6px,
+    calc(-1*var(--d))     calc(0*var(--d))     0 8px,
+    calc(-0.707*var(--d)) calc(-0.707*var(--d))0 10px,
+    calc(0*var(--d))      calc(-1*var(--d))    0 12px;
+  animation: s7 1s infinite steps(8);
+}
+
+@keyframes s7 {
+  100% {transform: rotate(1turn)}
+}

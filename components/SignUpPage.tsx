@@ -5,6 +5,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Cookies from 'js-cookie'
 import { toast } from "@/hooks/use-toast";
+import Checkbox from "./Checkbox";
+import Loader from "./Loader";
 
 export interface SignUpFormData {
   firstName: string;
@@ -23,12 +25,10 @@ const SignUpPage: React.FC = () => {
     formState: { errors, isValid },
   } = useForm<SignUpFormData>({mode: 'onChange'});
 
-  // const navigate = useNavigate();
   const router = useRouter();
 
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
-  // const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleTermsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsTermsAccepted(event.target.checked); // Update state based on checkbox
@@ -36,8 +36,7 @@ const SignUpPage: React.FC = () => {
 
   const handleRegistration: SubmitHandler<SignUpFormData> = async (data) => {
     console.log(data);
-    // setErrorMessage(null)
-    
+    setIsLoading(true)    
     try {
       const response = await fetch("/api/signup", {
         method: "POST",
@@ -64,7 +63,7 @@ const SignUpPage: React.FC = () => {
         })
         setTimeout(() => {
           router.push("/payment") 
-        }, 2000)
+        }, 500)
       } else {
         console.log("Failed to register user:", result.userMessage);
         // setErrorMessage(result.userMessage);
@@ -74,7 +73,7 @@ const SignUpPage: React.FC = () => {
           description: result.userMessage,
         })
       }
-
+      setIsLoading(false)    
     } catch (error) {
       console.error("Error during registration:", error);
       // setErrorMessage("Something went wrong. Please try again later.");
@@ -83,7 +82,9 @@ const SignUpPage: React.FC = () => {
         variant: 'destructive',
         description: "Something went wrong. Please try again later.",
       })
+      setIsLoading(false)    
     }
+    setIsLoading(false)    
   };
 
   return (
@@ -93,7 +94,7 @@ const SignUpPage: React.FC = () => {
       </div>
 
       <div className="col-span-3 px-2 sm:px-4 md:px-8 py-12">
-        <div className="text-center w-[65%] mx-auto mb-8">
+        <div className="text-center md:w-[65%] mx-auto mb-8">
           <h1 className="text-2xl text-white md:text-3xl font-semibold">
             Join Our Exclusive FX & Web3 Training Program
           </h1>
@@ -236,28 +237,32 @@ const SignUpPage: React.FC = () => {
             )}
           </div>
 
-          <div className="flex items-center gap-1">
-            <input
-              type="checkbox"
-              id="terms"
-              checked={isTermsAccepted}
-              onChange={handleTermsChange}
-              className="mr-2 h-5 w-5 bg-[#B3B3B3]"
-            />
+          <div className="flex items-center gap-1 mt-1">
+            <div className="mr-2">
+              <Checkbox 
+                isChecked={isTermsAccepted}
+                checkTerms={handleTermsChange}
+              />
+            </div>
             <label htmlFor="terms" className="text-[#B3B3B3]">
               Sign me up for the newsletter to get crypto tips and exclusive
               offers.
             </label>
           </div>
 
+          
+
           <button
           disabled={!isTermsAccepted || !isValid}
             type="submit"
             className={`bg-[#0094D9] text-white py-2.5 rounded-[5px] ${
-              !isTermsAccepted || !isValid ? "bg-[#73A5BC70] cursor-not-allowed" : 'cursor-pointer'
+              isLoading || !isTermsAccepted || !isValid ? "bg-[#73A5BC70] cursor-not-allowed" : 'cursor-pointer'
             }`}
           >
-            Continue
+            {isLoading? 
+              <Loader className=""/>
+            : 
+             'Continue'}
           </button>
         </form>
       </div>

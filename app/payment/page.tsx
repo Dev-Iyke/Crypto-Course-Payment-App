@@ -6,7 +6,21 @@ import { SignUpFormData } from '../../components/SignUpPage'
 import { toast } from '@/hooks/use-toast';
 import { tokens } from '@/lib/tokens';
 import { useRouter } from 'next/navigation';
-
+import Checkbox from '@/components/Checkbox';
+import Loader from '@/components/Loader';
+import { FailureModal, SuccessModal } from '@/components/Modals';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
+import { ArrowBigLeftIcon } from 'lucide-react';
 interface DatabaseUser extends SignUpFormData {
   id: string;
   isEligibleForDraw: boolean;
@@ -37,6 +51,9 @@ const PaymentPage = () => {
   const [isLinkLoading, setIsLinkLoading] = useState(false);
   const [isDetailsLoading, setIsDetailsLoading] = useState(false);
   const [isConfirmLoading, setIsConfirmLoading] = useState(false);
+  const [showFailedModal, setShowFailedModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
   const [paymentError, setPaymentError] = useState(null);
   
   const [paymentCoin, setPaymentCoin] = useState<string>('');
@@ -113,9 +130,6 @@ const PaymentPage = () => {
      console.log( `${paymentError}`)
     }
   }, [selectedCoin, paymentError])
-  // console.log(paymentError)
-  // console.log(paymentType)
-
 
   useEffect(() => {
     async function getCourseDetails(){
@@ -230,6 +244,7 @@ const PaymentPage = () => {
           variant: 'success',
           description: `${paymentData.message} \n An email has been sent to ${userDetails?.email}`,
         })
+        setShowSuccessModal(true)
       } catch (error: unknown) {
         console.log(error)
         if (error instanceof Error) {
@@ -247,67 +262,12 @@ const PaymentPage = () => {
             description: `An email has been sent to ${userDetails?.email}`,
           })
         }
+        setShowFailedModal(true)
       }
     }
     setIsConfirmLoading(false)
   }
 
-  // const getAllCoins = async () => {
-  //   try {
-  //     const response = await fetch(`/api/initialize-payment`, {
-  //       method: 'GET',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     })
-  //     const data = await response.json()
-  //     if(response.ok){
-  //       console.log(data)
-  //     }
-  //     throw new Error(data.error)
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }
-
-  // getAllCoins()
-
-  // const getMinimumAmount = async (currencyFrom, fiatEquivalent = "usd") => {
-  //   try {
-  //     const response = await axios.get(
-  //       `https://api.nowpayments.io/v1/min-amount`,
-  //       {
-  //         params: {
-  //           currency_from: currencyFrom, // e.g., "usdt"
-  //           currency_to: "usdt", // Use the same currency unless converting
-  //           fiat_equivalent: fiatEquivalent,
-  //           is_fixed_rate: false,
-  //           is_fee_paid_by_user: false,
-  //         },
-  //         headers: {
-  //           "x-api-key": API_KEY,
-  //         },
-  //       }
-  //     );
-
-  //     const minAmount = response.data.min_amount;
-  //     console.log(
-  //       `Minimum amount for ${currencyFrom}: ${minAmount} ${fiatEquivalent}`
-  //     );
-  //     return minAmount;
-  //   } catch (error) {
-  //     console.error(
-  //       "Error fetching minimum amount",
-  //       error.response?.data || error.message
-  //     );
-  //     return null;
-  //   }
-  // };
-
-  // getMinimumAmount("usdc");
-
-
-  // console.log(userDetails)
   return (
     <div className="p-4 grid grid-cols-1 md:grid-cols-2 items-center bg-[#181818] rounded-xl"
       onClick={() => {
@@ -320,7 +280,10 @@ const PaymentPage = () => {
       }
     }>
       <div className="min-h-[50vh] md:h-full bg-paymentBg bg-cover bg-center rounded-xl">
-        <button onClick={() => router.back()} className="text-white p-4">back</button>
+        <button onClick={() => router.back()} className="text-white p-4 flex gap-1 cursor-pointer">
+          <ArrowBigLeftIcon />
+          <span>Back</span>
+        </button>
       </div>
 
       <div className="px-4 md:px-8 pt-12 pb-32">
@@ -377,15 +340,18 @@ const PaymentPage = () => {
               </ul>
             )}
 
-            <p>{courseDetails?.message}</p>
             
           </div>
-          <p>
-            Total Amount:{" "}
-            <span className="text-white text-lg font-semibold">${paymentPrice}</span>
-          </p>
-
-          {isDetailsLoading && <p>Details loading</p>}
+          {isDetailsLoading ? 
+            <Loader className='mt-2' /> :
+            <div>
+              <p>{courseDetails?.message}</p>
+              {courseDetails && <p>
+                Total Amount:{" "}
+                <span className="text-white text-lg font-semibold">${paymentPrice}</span>
+              </p>}
+            </div>
+          }
         </div>
 
         <div className="flex flex-col gap-6 relative">
@@ -452,34 +418,41 @@ const PaymentPage = () => {
           )}
 
           <div>
-          <button
-            // disabled={!isConfirmLoading}
-              onClick={confirmPayment}
-              className={`bg-[#0094D9] text-white py-2.5 rounded-[5px] w-full ${
-                isConfirmLoading
-                  ? "bg-[#73A5BC70] cursor-not-allowed"
-                  : "cursor-pointer hover:opacity-80"
-              }`}
-            >
-              {isConfirmLoading ? "Confirming Last Payment..." : "Confirm Last Payment"}
-            </button>
+            <AlertDialog>
+              <button
+              // disabled={!isConfirmLoading}
+                onClick={confirmPayment}
+                className={`bg-[#0094D9] text-white py-2.5 rounded-[5px] w-full ${
+                  isConfirmLoading
+                    ? "bg-[#73A5BC70] cursor-not-allowed"
+                    : "cursor-pointer hover:opacity-80"
+                }`}
+              >
+                {isConfirmLoading ? "Confirming Last Payment..." : "Confirm Last Payment"}
+              </button>
+              {showSuccessModal && (
+              <SuccessModal openStatus={showSuccessModal} openChange={setShowSuccessModal} />
+              )}
+
+              {showFailedModal && (
+              <FailureModal openStatus={showFailedModal} openChange={setShowFailedModal} />
+              )}
+            </AlertDialog>
           </div>
 
           <div className="flex items-center gap-1">
-            <input
-              type="checkbox"
-              id="terms"
-              checked={isTermsAccepted}
-              onChange={handleTermsChange}
-              className="mr-2 h-5 w-5 bg-[#B3B3B3]"
-            />
+          <div className="mr-2">
+              <Checkbox
+                isChecked={isTermsAccepted}
+                checkTerms={handleTermsChange}
+              />
+            </div>
             <label htmlFor="terms" className="text-[#B3B3B3]">
               By proceeding with payment, you agree to our Terms and Conditions
               and Privacy Policy.
             </label>
           </div>
         </div>
-        {/* <ToastContainer /> */}
       </div>
     </div>
   )
