@@ -11,6 +11,7 @@ import Loader from '@/components/Loader';
 import { FailureModal, SuccessModal } from '@/components/Modals';
 import {AlertDialog} from "@/components/ui/alert-dialog"
 import { ArrowBigLeftIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 interface DatabaseUser extends SignUpFormData {
   id: string;
   isEligibleForDraw: boolean;
@@ -84,6 +85,7 @@ const PaymentPage = () => {
               title: 'Failed!',
               variant: 'destructive',
               description: data.error,
+              action: <Button onClick={() => router.push('/')}>Sign Up</Button>
             })
             throw new Error(`${data.error}`)
           }
@@ -95,6 +97,7 @@ const PaymentPage = () => {
           title: 'Failed!',
           variant: 'destructive',
           description: `${error}`,
+          action: <Button onClick={() => router.push('/')}>Sign Up</Button>
         })
       }
     }
