@@ -3,16 +3,8 @@ import { prisma } from '@/lib/prisma';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log('Incoming POST data:', body); // Debug log
+    console.log('Incoming POST data:', body);
     
-    //TODO:Remove this check if clients wants a user to signup multiple times with the same email
-    const userExists = await prisma.user.findFirst({
-      where: { email: body.email },
-    })
-    //Also remove the unique parameter from email column in backend
-    if (userExists){
-      return new Response(JSON.stringify({userMessage:`User ${body.email} Already Exists`, ok: false}), { status: 200 });
-    }
     const user = await prisma.user.create({
       data: {
         firstName: body.firstName,

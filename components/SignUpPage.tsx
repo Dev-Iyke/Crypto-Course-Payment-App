@@ -59,14 +59,13 @@ const SignUpPage: React.FC = () => {
         toast({
           title: 'Success!',
           variant: 'success',
-          description: 'User details stored🎉🎉',
+          description: 'Registration successfully🎉🎉',
         })
         setTimeout(() => {
           router.push("/payment") 
         }, 500)
       } else {
         console.log("Failed to register user:", result.userMessage);
-        // setErrorMessage(result.userMessage);
         toast({
           title: 'Registration Failed!',
           variant: 'destructive',
@@ -76,7 +75,6 @@ const SignUpPage: React.FC = () => {
       setIsLoading(false)    
     } catch (error) {
       console.error("Error during registration:", error);
-      // setErrorMessage("Something went wrong. Please try again later.");
       toast({
         title: 'Registration Failed!',
         variant: 'destructive',
@@ -102,10 +100,6 @@ const SignUpPage: React.FC = () => {
             Sign up now to secure your spot{" "}
           </p>
         </div>
-
-        {/* {errorMessage && (
-          <p className="text-red-500 text-center">{errorMessage}</p>
-        )} */}
 
         <form
           onSubmit={handleSubmit(handleRegistration)}
@@ -155,13 +149,11 @@ const SignUpPage: React.FC = () => {
               {...register("course", {
                 required: "Please select your course(s)",
               })}
-              
               className="bg-[#222121] py-2 px-3 text-lg rounded-[5px] text-white outline-none placeholder:text-[#5B5B5B]"
             >
               <option value='' disabled>Select your course</option>
               <option value="trading">Trading Training</option>
               <option value="web3">Web3 course</option>
-              {/* <option value="both">Both Courses</option> */}
             </select>
             {errors.course && (
               <p className="text-red-500">{errors.course.message}</p>

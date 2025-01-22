@@ -27,6 +27,13 @@ interface CourseDetails {
   price: number;
   message: string;
 }
+
+interface paymentDataProps {
+  status: number;
+  message?: string;
+  error?: string;
+}
+
 const PaymentPage = () => {
   const [userDetails, setUserDetails] = useState<DatabaseUser>() || null
   const [paymentType, setPaymentType] = useState<string>('');
@@ -49,7 +56,9 @@ const PaymentPage = () => {
   const [paymentCoin, setPaymentCoin] = useState<string>('');
   // const [paymentAmount, setPaymentAmount] = useState(0);
   const [paymentUrl, setPaymentUrl] = useState(null);
+  const [paymentData, setPaymentData] = useState<paymentDataProps>();
   // const [paymentLinkGenerated, setPaymentLinkGenerated] = useState(false);
+
   console.log(paymentCoin)
 
   const router = useRouter()
@@ -81,7 +90,7 @@ const PaymentPage = () => {
         } 
 
       } catch (error) {
-        console.log(error)
+        console.log('Could not get details', error)
       }
     }
     getUserId()
@@ -224,34 +233,15 @@ const PaymentPage = () => {
           body: JSON.stringify({course: userDetails?.course, paymentType: pd.paymentType, paymentId: pd.id, userId: userDetails?.id, paymentAmount: parseInt(pd.price_amount)})
         })
         const paymentData = await response.json();
+        setPaymentData(paymentData)
         if(!response.ok){
           console.log(paymentData.error)
           throw new Error(`Confirmation error: ${paymentData.error}`)
         }
         console.log(paymentData.message)
-        toast({
-          title: 'Success!',
-          variant: 'success',
-          description: `${paymentData.message} \n An email has been sent to ${userDetails?.email}`,
-        })
         setShowSuccessModal(true)
       } catch (error: unknown) {
         console.log(error)
-        if (error instanceof Error) {
-          // Using a well-defined error message for the toast
-          toast({
-            title: 'Failed!',
-            variant: 'destructive',
-            description: `${error.message} \n An email has been sent to ${userDetails?.email}`,
-          });
-        } else {
-          // Fallback in case the error is not an instance of Error
-          toast({
-            title: 'Failed!',
-            variant: 'destructive',
-            description: `An email has been sent to ${userDetails?.email}`,
-          })
-        }
         setShowFailedModal(true)
       }
     }
@@ -421,11 +411,17 @@ const PaymentPage = () => {
                 {isConfirmLoading ? "Confirming Last Payment..." : "Confirm Last Payment"}
               </button>
               {showSuccessModal && (
-              <SuccessModal openStatus={showSuccessModal} openChange={setShowSuccessModal} />
+              <SuccessModal 
+                openStatus={showSuccessModal} 
+                message={`${paymentData?.message || paymentData?.error}. An email has been sent to ${userDetails?.email}`} 
+                openChange={setShowSuccessModal} />
               )}
 
               {showFailedModal && (
-              <FailureModal openStatus={showFailedModal} openChange={setShowFailedModal} />
+              <FailureModal 
+                message={`${paymentData?.error || paymentData?.message}. `}
+                openStatus={showFailedModal} 
+                openChange={setShowFailedModal} />
               )}
             </AlertDialog>
           </div>

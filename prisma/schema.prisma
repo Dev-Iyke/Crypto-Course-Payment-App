@@ -13,7 +13,7 @@ model User {
   id                String    @id @default(uuid())
   firstName         String    @default("")
   lastName          String    @default("")
-  email             String    @unique @default("")
+  email             String    @default("")
   course            String    @default("")
   country           String    @default("")
   state             String    @default("")

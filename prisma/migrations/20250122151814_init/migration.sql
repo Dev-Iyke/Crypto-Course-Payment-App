@@ -59,9 +59,6 @@ CREATE TABLE "EmailQueue" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Payment_paymentId_key" ON "Payment"("paymentId");
 
 -- CreateIndex

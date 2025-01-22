@@ -21,14 +21,18 @@ export async function POST(req: Request) {
             <h1 style="text-align: center; background-color: green; color: white; padding: 10px;">Course Payment Confirmation</h1>
           </header>
           <main style="padding: 20px; background-color: yellow;">
+            <div style='width: 300px; margin: 0 auto;'>
+              <img style='width: 200px; height: 200px;' src="https://bulleyesfxsignalcom.wordpress.com/wp-content/uploads/2021/11/logo5_21_173852-5.png" alt="logo" />
+            </div>
             <p style='text-align: center;'>Dear ${userEmail},</p>
             <p style='text-align: center;'>We are pleased to confirm your payment of <strong>$${paymentAmount}</strong> for the <strong>${course}</strong> course.</p>
             <p style='text-align: center;'>Thank you for choosing our services!</p>
             <p style='text-align: center; color: blue;'>Best regards,</p>
             <p style='text-align: center; color: blue;'>The Team</p>
+            <p style='text-align: center; font-weight: bold; color: black;'>Please send all replies or complaints to ${process.env.SENDGRID_MY_CLIENT_EMAIL!}</p>
           </main>
-          <footer style="">
-            <p style='background-color: black; color: white; font-size: 15px; padding: 10px; text-align: center;'>&copy; 2024 Bright FX. All rights reserved.</p>
+          <footer style="padding-top: 100px;">
+            <p style='background-color: black; color: white; font-size: 15px; padding: 10px; text-align: center;'>&copy; 2025 Bright FX. All rights reserved.</p>
           </footer>
         </body>
       </html>
