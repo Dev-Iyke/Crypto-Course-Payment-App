@@ -85,12 +85,17 @@ const PaymentPage = () => {
               variant: 'destructive',
               description: data.error,
             })
-            throw new Error(`User not found`)
+            throw new Error(`${data.error}`)
           }
         } 
 
       } catch (error) {
         console.log('Could not get details', error)
+        toast({
+          title: 'Failed!',
+          variant: 'destructive',
+          description: `${error}`,
+        })
       }
     }
     getUserId()
