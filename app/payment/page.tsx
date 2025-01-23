@@ -10,7 +10,7 @@ import Checkbox from '@/components/Checkbox';
 import Loader from '@/components/Loader';
 import { FailureModal, SuccessModal } from '@/components/Modals';
 import {AlertDialog} from "@/components/ui/alert-dialog"
-import { ArrowBigLeftIcon } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 interface DatabaseUser extends SignUpFormData {
   id: string;
@@ -55,10 +55,8 @@ const PaymentPage = () => {
   const [paymentError, setPaymentError] = useState(null);
   
   const [paymentCoin, setPaymentCoin] = useState<string>('');
-  // const [paymentAmount, setPaymentAmount] = useState(0);
   const [paymentUrl, setPaymentUrl] = useState(null);
   const [paymentData, setPaymentData] = useState<paymentDataProps>();
-  // const [paymentLinkGenerated, setPaymentLinkGenerated] = useState(false);
 
   console.log(paymentCoin)
 
@@ -89,14 +87,16 @@ const PaymentPage = () => {
             })
             throw new Error(`${data.error}`)
           }
-        } 
+        } else {
+          console.log('no id found')
+        }
 
       } catch (error) {
-        console.log('Could not get details', error)
+        console.log('Could not get details')
         toast({
           title: 'Failed!',
           variant: 'destructive',
-          description: `${error}`,
+          description: 'Could not get details',
           action: <Button onClick={() => router.push('/')}>Sign Up</Button>
         })
       }
@@ -179,8 +179,9 @@ const PaymentPage = () => {
   }, [paymentType, userDetails])
 
   async function generatePaymentLink(){
+    if (userDetails) {
       console.log(`Generating payment link`)
-      console.log(paymentPrice, paymentType, userDetails?.course)
+      console.log(paymentPrice, paymentType, userDetails.course)
       setIsLinkLoading(true)
       try {
         const response = await fetch(`/api/initialize-payment`, {
@@ -188,7 +189,7 @@ const PaymentPage = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({course:userDetails?.course, price: paymentPrice, paymentType}),
+          body: JSON.stringify({course:userDetails.course, price: paymentPrice, paymentType}),
         })
 
         if(response.ok){
@@ -223,13 +224,21 @@ const PaymentPage = () => {
         console.log(error)
         setIsLinkLoading(false)
       }
+    } else {
+      toast({
+        title: 'Failed!',
+        variant: 'destructive',
+        description: 'User or course details not found',
+        action: <Button onClick={() => router.push('/')}>Sign Up</Button>
+      })
+    }
   }
 
   const confirmPayment = async () => {
-    setIsConfirmLoading(true)
-    console.log('Confirming payment...')
     const paymentDetails = Cookies.get('paymentDetails')
     if (paymentDetails){
+      setIsConfirmLoading(true)
+      console.log('Confirming payment...')
       const pd = JSON.parse(paymentDetails)
       console.log(pd)
       try {
@@ -252,6 +261,13 @@ const PaymentPage = () => {
         console.log(error)
         setShowFailedModal(true)
       }
+    } else {
+      toast({
+        title: 'Failed!',
+        variant: 'destructive',
+        description: 'No payment data not found',
+        action: <Button onClick={() => router.push('/')}>Sign Up</Button>
+      })
     }
     setIsConfirmLoading(false)
   }
@@ -269,7 +285,7 @@ const PaymentPage = () => {
     }>
       <div className="min-h-[50vh] md:h-full bg-paymentBg bg-cover bg-center rounded-xl">
         <button onClick={() => router.back()} className="text-white p-4 flex gap-1 cursor-pointer">
-          <ArrowBigLeftIcon />
+          <ChevronLeft />
           <span>Back</span>
         </button>
       </div>
