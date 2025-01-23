@@ -89,7 +89,7 @@ const PaymentPage = () => {
           }
         } else {
           console.log('no id found')
-          alert('no id found')
+          alert('no user found')
         }
 
       } catch (error) {
