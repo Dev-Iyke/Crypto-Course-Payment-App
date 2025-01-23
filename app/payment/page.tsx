@@ -89,10 +89,11 @@ const PaymentPage = () => {
           }
         } else {
           console.log('no id found')
+          alert('no id found')
         }
 
       } catch (error) {
-        console.log('Could not get details')
+        console.log('Could not get details', error)
         toast({
           title: 'Failed!',
           variant: 'destructive',
@@ -102,7 +103,7 @@ const PaymentPage = () => {
       }
     }
     getUserId()
-  }, [setUserDetails])
+  }, [setUserDetails, router])
 
   console.log(userDetails?.email)
 
@@ -290,7 +291,7 @@ const PaymentPage = () => {
         </button>
       </div>
 
-      <div className="px-4 md:px-8 pt-12 pb-32">
+      <div className="px-4 md:px-8 pt-12 pb-12 md:pb-24">
         <div className="text-center mx-auto mb-8">
           <h1 className="text-white text-2xl md:text-3xl font-semibold">
             Complete Your Payment
