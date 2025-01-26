@@ -53,6 +53,7 @@ const PaymentPage = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const [paymentError, setPaymentError] = useState(null);
+  const [idError, setIdError] = useState(false);
   
   const [paymentCoin, setPaymentCoin] = useState<string>('');
   const [paymentUrl, setPaymentUrl] = useState(null);
@@ -89,7 +90,7 @@ const PaymentPage = () => {
           }
         } else {
           console.log('no id found')
-          alert('no user found')
+          setIdError(true)
         }
 
       } catch (error) {
@@ -105,7 +106,14 @@ const PaymentPage = () => {
     getUserId()
   }, [setUserDetails, router])
 
-  console.log(userDetails?.email)
+  useEffect(() => {
+    toast({
+      title: 'Failed!',
+      variant: 'destructive',
+      description: 'Could not get User id',
+      action: <Button onClick={() => router.push('/')}>Sign Up</Button>
+    })
+  }, [idError])
 
   const handleTermsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsTermsAccepted(event.target.checked);
