@@ -59,7 +59,7 @@ const PaymentPage = () => {
   const [paymentUrl, setPaymentUrl] = useState(null);
   const [paymentData, setPaymentData] = useState<paymentDataProps>();
 
-  // console.log(paymentCoin)
+  console.log(paymentCoin)
 
   const router = useRouter()
   useEffect(() => {
@@ -114,7 +114,7 @@ const PaymentPage = () => {
         action: <Button onClick={() => router.push('/')}>Sign Up</Button>
       })
     }
-  }, [idError])
+  }, [idError, router])
 
   const handleTermsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsTermsAccepted(event.target.checked);
