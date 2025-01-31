@@ -1,24 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-interface RouteContext {
-  params: {
-    id: string;
-  };
-}
-
-export async function GET(req: NextRequest, context: RouteContext) {
-  //Fetching a single user from the database
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const allParams = context.params;
-    const id = allParams.id
+    const id = params.id; // Extract ID directly
 
     if (!id) {
       return NextResponse.json({ error: "Missing or invalid user ID" }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: id },
+      where: { id },
     });
 
     if (!user) {

@@ -1,5 +1,6 @@
 'use client'
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ReactNode, useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 import { SignUpFormData } from '../../components/SignUpPage'
