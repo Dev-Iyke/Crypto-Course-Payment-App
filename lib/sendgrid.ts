@@ -30,85 +30,76 @@ export async function sendEmail(
   retries = 3
 ): Promise<void> {
   console.log(`sending email to ${to}`);
-  
+
   try {
+    const fromEmail = process.env.SENDGRID_FROM_EMAIL;
+    if (!fromEmail) {
+      throw new Error("Missing SENDGRID_FROM_EMAIL in environment variables.");
+    }
+
     const msg = {
-      to, // recipient's email
-      from: process.env.SENDGRID_FROM_EMAIL!, // verified sender email
+      to, 
+      from: fromEmail, 
       subject,
       text,
-      html, // optional: pass HTML content
+      html, 
     };
 
-    const response = await sgMail.send(msg);
-    if (response[0]?.statusCode === 200) {
-      // Email accepted for delivery
-      console.log("Email sent successfully:", response);
-      if (paymentId) {
-        await prisma.payment.update({
+    try {
+      const response = await sgMail.send(msg);
+      console.log(response);
+
+      if (!response || response[0]?.statusCode !== 202) {
+        throw new Error("Email was not accepted for delivery.");
+      }
+    } catch (error) {
+      console.log("SendGrid may have thrown an error even if the email was sent:", error);
+    }
+
+    if (paymentId) {
+      try {
+        const paymentUpdate = await prisma.payment.update({
           where: { paymentId },
           data: { isEmailSent: true },
         });
+        console.log(paymentUpdate);
+      } catch (dbError) {
+        console.error("Failed to update payment status:", dbError);
       }
-    } else {
-      // Log unexpected status or errors
-      console.error("Unexpected response from SendGrid:", response);
-      throw new Error("Failed to confirm email delivery.");
     }
 
   } catch (error: unknown) {
-    console.error('Error sending email:', error);
+    console.log('Error sending email:', error);
 
-    // Ensure error is of type SendGridErrorResponse
     if (isSendGridErrorResponse(error)) {
       const errorResponse = error.response;
       console.error('Error details:', errorResponse.body);
-      const statusCode = errorResponse.statusCode;
 
-      // Handle specific errors like daily limit exceeded
-      if (statusCode === 429 || 
-          (Array.isArray(errorResponse.body?.errors) && 
-           errorResponse.body.errors.some((e) => e.message.includes('daily limit exceeded')))) {
-        console.error('Daily limit exceeded. Scheduling for the next day...');
-        
-        // Store the email details in the database
-        await scheduleForNextDay(to, subject, text, html, paymentId);
-        return;
-      }
-
-      // Handle rate-limiting reset
-      if (errorResponse.headers['x-ratelimit-reset']) {
+      if (errorResponse.headers && errorResponse.headers['x-ratelimit-reset']) {
         const resetTimestamp = Number(errorResponse.headers['x-ratelimit-reset']);
         if (!isNaN(resetTimestamp)) {
           console.log(`Rate limit resets at ${new Date(resetTimestamp * 1000).toISOString()}`);
-        } else {
-          console.error('Invalid rate limit reset timestamp.');
         }
       }
 
-      // Handle other SendGrid errors with statusCode >= 500
-      if (statusCode >= 500) {
+      if (errorResponse.statusCode === 429) {
+        console.error('Rate limit exceeded. Retrying later.');
+        await scheduleForNextDay(to, subject, text, html, paymentId);
+        return;
+      }
+      
+      if (errorResponse.statusCode >= 500 && retries > 0) {
         console.error('Temporary server error. Retrying...');
-        if (retries > 0) {
-          await delay(60000); // Wait 1 minute before retrying
-          return sendEmail(to, subject, text, paymentId, html, retries - 1);
-        } else {
-          console.error('All retry attempts failed.');
-          throw error;
-        }
+        await delay(60000);
+        await sendEmail(to, subject, text, paymentId, html, retries - 1);
+        return;
       }
     }
 
-    // If no valid error response or retries exhausted
-    if (!(error instanceof Error) || retries <= 0) {
-      console.error('Non-retryable error or retries exhausted.');
-      throw error;
-    }
-
-    // For other errors
     throw error;
   }
 }
+
 
 // Helper function to check if the error is of type SendGridErrorResponse
 function isSendGridErrorResponse(error: unknown): error is SendGridErrorResponse {

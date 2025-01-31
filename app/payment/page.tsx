@@ -59,60 +59,61 @@ const PaymentPage = () => {
   const [paymentUrl, setPaymentUrl] = useState(null);
   const [paymentData, setPaymentData] = useState<paymentDataProps>();
 
-  console.log(paymentCoin)
+  // console.log(paymentCoin)
 
   const router = useRouter()
   useEffect(() => {
-    async function getUserId(){
+    async function getUserId() {
       try {
-        const userId = Cookies.get('userId')
-        console.log(userId)
-        if(userId){
-          const response = await fetch(`/api/users/${userId}`)
-          if(response.ok){
-            const data = await response.json()
-            setUserDetails(data)
-            toast({
-              title: 'Success!',
-              variant: 'success',
-              description: 'User details fetched successfully🎉🎉',
-            })
-          } else {
-            const data = await response.json()
-            console.log('Error fetching user', data.error)
-            toast({
-              title: 'Failed!',
-              variant: 'destructive',
-              description: data.error,
-              action: <Button onClick={() => router.push('/')}>Sign Up</Button>
-            })
-            throw new Error(`${data.error}`)
-          }
-        } else {
-          console.log('no id found')
-          setIdError(true)
+        const userId = Cookies.get("userId");
+        // console.log("User ID from cookies:", userId);
+  
+        if (!userId) {
+          throw new Error("No user ID found in cookies");
         }
-
-      } catch (error) {
-        console.log('Could not get details', error)
+  
+        const response = await fetch(`/api/users/${userId}`);
+        
+        if (!response.ok) {
+          throw new Error(`Error fetching user: ${response.statusText}`);
+        }
+  
+        const data = await response.json();
+        // console.log("Fetched user data:", data);
+        setUserDetails(data);
+  
         toast({
-          title: 'Failed!',
-          variant: 'destructive',
-          description: 'Could not get details',
-          action: <Button onClick={() => router.push('/')}>Sign Up</Button>
-        })
+          title: "Success!",
+          variant: "success",
+          description: "User details fetched successfully 🎉",
+        });
+      } catch (error) {
+        // console.error("Could not get user details:", error);
+  
+        toast({
+          title: "Failed!",
+          variant: "destructive",
+          description: "Could not get details",
+          action: <Button onClick={() => router.push("/")}>Sign Up</Button>,
+        });
+  
+        setIdError(true);
       }
     }
-    getUserId()
-  }, [setUserDetails, router])
+    
+    getUserId();
+  }, [setUserDetails, router]);
+  
 
   useEffect(() => {
-    toast({
-      title: 'Failed!',
-      variant: 'destructive',
-      description: 'Could not get User id',
-      action: <Button onClick={() => router.push('/')}>Sign Up</Button>
-    })
+    if(idError){
+      toast({
+        title: 'Failed!',
+        variant: 'destructive',
+        description: 'Could not get User id',
+        action: <Button onClick={() => router.push('/')}>Sign Up</Button>
+      })
+    }
   }, [idError])
 
   const handleTermsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,7 +144,7 @@ const PaymentPage = () => {
         variant: 'destructive',
         description: paymentError,
       })
-     console.log( `${paymentError}`)
+    //  console.log( `${paymentError}`)
     }
   }, [selectedCoin, paymentError])
 
@@ -162,13 +163,13 @@ const PaymentPage = () => {
 
           if(response.ok){
             const data = await response.json()
-            console.log(data)
+            // console.log(data)
             setCourseDetails(data)
             setPaymentPrice(data.price)
           } else {
             const data = await response.json()
-            console.log(data)
-            console.log('Error fetching course', data.error)
+            // console.log(data)
+            // console.log('Error fetching course', data.error)
             toast({
               title: 'Failed!',
               variant: 'destructive',
@@ -178,7 +179,7 @@ const PaymentPage = () => {
           }
           setIsDetailsLoading(false)
         } catch (error) {
-          console.log(error)
+          // console.log(error)
           setIsDetailsLoading(false)
         }
       }
@@ -189,8 +190,8 @@ const PaymentPage = () => {
 
   async function generatePaymentLink(){
     if (userDetails) {
-      console.log(`Generating payment link`)
-      console.log(paymentPrice, paymentType, userDetails.course)
+      // console.log(`Generating payment link`)
+      // console.log(paymentPrice, paymentType, userDetails.course)
       setIsLinkLoading(true)
       try {
         const response = await fetch(`/api/initialize-payment`, {
@@ -203,14 +204,14 @@ const PaymentPage = () => {
 
         if(response.ok){
           const data = await response.json()
-          console.log(data)
+          // console.log(data)
           Cookies.set('paymentDetails', JSON.stringify({...data, paymentType}));
-          const paymentData = Cookies.get('paymentDetails')
-          if (paymentData) {
-            console.log(JSON.parse(paymentData));
-          } else {
-            console.log('not found');
-          }
+          // const paymentData = Cookies.get('paymentDetails')
+          // if (paymentData) {
+          //   console.log(JSON.parse(paymentData));
+          // } else {
+          //   console.log('not found');
+          // }
           setPaymentUrl(data.invoice_url)
           toast({
             title: 'Success!',
@@ -219,8 +220,8 @@ const PaymentPage = () => {
           })
         } else {
           const data = await response.json()
-          console.log(data)
-          console.log('Error fetching course', data.error)
+          // console.log(data)
+          // console.log('Error fetching course', data.error)
           toast({
             title: 'Failed!',
             variant: 'destructive',
@@ -230,7 +231,7 @@ const PaymentPage = () => {
         }
         setIsLinkLoading(false)
       } catch (error) {
-        console.log(error)
+        // console.log(error)
         setIsLinkLoading(false)
       }
     } else {
@@ -247,9 +248,9 @@ const PaymentPage = () => {
     const paymentDetails = Cookies.get('paymentDetails')
     if (paymentDetails){
       setIsConfirmLoading(true)
-      console.log('Confirming payment...')
+      // console.log('Confirming payment...')
       const pd = JSON.parse(paymentDetails)
-      console.log(pd)
+      // console.log(pd)
       try {
         const response = await fetch('/api/confirm-payment', {
           method: 'POST',
@@ -261,13 +262,13 @@ const PaymentPage = () => {
         const paymentData = await response.json();
         setPaymentData(paymentData)
         if(!response.ok){
-          console.log(paymentData.error)
+          // console.log(paymentData.error)
           throw new Error(`Confirmation error: ${paymentData.error}`)
         }
-        console.log(paymentData.message)
+        // console.log(paymentData.message)
         setShowSuccessModal(true)
       } catch (error: unknown) {
-        console.log(error)
+        // console.log(error)
         setShowFailedModal(true)
       }
     } else {

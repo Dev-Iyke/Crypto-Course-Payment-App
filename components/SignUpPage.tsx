@@ -35,7 +35,7 @@ const SignUpPage: React.FC = () => {
   };
 
   const handleRegistration: SubmitHandler<SignUpFormData> = async (data) => {
-    console.log(data);
+    // console.log(data);
     setIsLoading(true)    
     try {
       const response = await fetch("/api/signup", {
@@ -53,9 +53,10 @@ const SignUpPage: React.FC = () => {
       
       const result = await response.json();
       if (result.ok) {
-        console.log("User registration request sent:", result);
+        // console.log("User registration request sent:", result);
         // setErrorMessage(result.userMessage);
-        Cookies.set("userId", result.user.id)
+        Cookies.set("userId", String(result.user.id), { expires: 7 }); // Store as a string, set expiration
+
         toast({
           title: 'Success!',
           variant: 'success',
@@ -65,7 +66,7 @@ const SignUpPage: React.FC = () => {
           router.push("/payment") 
         }, 500)
       } else {
-        console.log("Failed to register user:", result.userMessage);
+        // console.log("Failed to register user:", result.userMessage);
         toast({
           title: 'Registration Failed!',
           variant: 'destructive',
@@ -74,7 +75,7 @@ const SignUpPage: React.FC = () => {
       }
       setIsLoading(false)    
     } catch (error) {
-      console.error("Error during registration:", error);
+      // console.error("Error during registration:", error);
       toast({
         title: 'Registration Failed!',
         variant: 'destructive',
