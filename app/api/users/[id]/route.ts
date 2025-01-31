@@ -1,9 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+// Explicitly define context type correctly
+interface RouteContext {
+  params: Promise<{
+    id: string;
+  }>;
+}
+
+export async function GET(req: NextRequest, context: RouteContext) {
   try {
-    const id = params.id; // Extract ID directly
+    const { id } = await context.params; // Extract ID correctly
 
     if (!id) {
       return NextResponse.json({ error: "Missing or invalid user ID" }, { status: 400 });
